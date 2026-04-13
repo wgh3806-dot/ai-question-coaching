@@ -558,17 +558,32 @@ def generate_prompt(preview_text, style, task_type=None, max_tokens=500):
 - 답변 생성 금지
 - 코드블럭(```) 사용 금지
 
-[프롬프트 구조]
-1. 역할 
-2. 목표 
-3. 조건 
-4. 출력 형식 
+[출력 템플릿 - 반드시 그대로 따를 것]
+
+1. 역할
+[여기에 역할 작성]
+
+2. 목표
+[여기에 목표 작성]
+
+3. 조건
+- [조건1]
+- [조건2]
+- [조건3]
+
+4. 출력 형식
+[여기에 출력 형식 작성]
+
+[형식 강제 규칙]
+- 위 템플릿을 반드시 그대로 따를 것
+- 제목과 본문을 한 줄에 작성하는 것 금지
+- "1. 역할 포항시..." 형태 절대 금지
+- 조건은 반드시 '-' 리스트 형식으로 작성
+- a, b, c 형식 절대 사용 금지
 
 [구조 규칙]
 - 반드시 위 구조를 그대로 따를 것
 - 번호 형식 (1~4) 절대 변경 금지
-- 각 항목은 "제목 1줄 + 본문" 구조 유지
-- 줄바꿈 오류 절대 금지
 
 [절대 형식 규칙 - 위반 금지]
 - "1. 역할", "2. 목표", "3. 조건", "4. 출력 형식"은 반드시 한 줄로 작성할 것
@@ -808,94 +823,94 @@ def convert_prompt_to_sentence(prompt_text, max_tokens=500):
 
     return request_chat(system_prompt, user_input, max_tokens=max_tokens)
 
-def evaluate_prompt(prompt, style, max_tokens=300):
-    prompt = prompt.strip() if prompt else ""
-    style_instruction = get_style_instruction(style)
-    task_evidence_rules = get_task_evidence_rules(prompt)
+# def evaluate_prompt(prompt, style, max_tokens=300):
+#     prompt = prompt.strip() if prompt else ""
+#     style_instruction = get_style_instruction(style)
+#     task_evidence_rules = get_task_evidence_rules(prompt)
 
-    if not prompt:
-        raise ValueError("평가할 프롬프트가 비어 있습니다.")
+#     if not prompt:
+#         raise ValueError("평가할 프롬프트가 비어 있습니다.")
 
-    system_prompt = f"""
-너는 프롬프트 품질을 객관적으로 평가하는 전문가다.
+#     system_prompt = f"""
+# 너는 프롬프트 품질을 객관적으로 평가하는 전문가다.
 
-반드시 아래 형식으로만 출력하라:
+# 반드시 아래 형식으로만 출력하라:
 
-[목표]
-프롬프트의 실무 활용 가능성과 명확성을 기준으로 점수를 평가한다.
+# [목표]
+# 프롬프트의 실무 활용 가능성과 명확성을 기준으로 점수를 평가한다.
 
-[평가 기준] (각 20점, 총 100점)
+# [평가 기준] (각 20점, 총 100점)
 
-1. 역할 명확성
-- 수행 역할이 구체적인가
-- 단순 '전문가'가 아닌가
+# 1. 역할 명확성
+# - 수행 역할이 구체적인가
+# - 단순 '전문가'가 아닌가
 
-2. 목표 구체성
-- 무엇을 위한 프롬프트인지 명확한가
-- 활용 맥락이 포함되어 있는가
+# 2. 목표 구체성
+# - 무엇을 위한 프롬프트인지 명확한가
+# - 활용 맥락이 포함되어 있는가
 
-3. 조건 적절성
-- 실행 가능한 기준인가
-- 모호한 표현이 없는가
+# 3. 조건 적절성
+# - 실행 가능한 기준인가
+# - 모호한 표현이 없는가
 
-4. 출력 형식 명확성
-- 결과 형태가 명확한가
-- 바로 사용 가능한가
+# 4. 출력 형식 명확성
+# - 결과 형태가 명확한가
+# - 바로 사용 가능한가
 
-5. 실행 가능성
-- AI가 바로 이해하고 실행 가능한 수준인가
+# 5. 실행 가능성
+# - AI가 바로 이해하고 실행 가능한 수준인가
 
-[점수 계산 규칙]
-- 각 항목을 0~20점으로 평가
-- 총점 = 5개 항목 합계
+# [점수 계산 규칙]
+# - 각 항목을 0~20점으로 평가
+# - 총점 = 5개 항목 합계
 
-[점수 기준 강화]
-- 기본적으로 구조가 맞으면 70점 이상 부여
-- 실무 사용 가능하면 80점 이상 부여
-- 매우 우수한 경우에만 90점 이상 부여
-- 지나치게 낮은 점수 금지
+# [점수 기준 강화]
+# - 기본적으로 구조가 맞으면 70점 이상 부여
+# - 실무 사용 가능하면 80점 이상 부여
+# - 매우 우수한 경우에만 90점 이상 부여
+# - 지나치게 낮은 점수 금지
 
-[평가]
-각 항목별 간단한 평가 작성
+# [평가]
+# 각 항목별 간단한 평가 작성
 
-[점수 출력 규칙 - 매우 중요]
-- 반드시 숫자만 단독으로 출력
-- "85점", "총점 85" 절대 금지
-- 반드시 아래 형식 유지
+# [점수 출력 규칙 - 매우 중요]
+# - 반드시 숫자만 단독으로 출력
+# - "85점", "총점 85" 절대 금지
+# - 반드시 아래 형식 유지
 
-[점수]
-숫자만 나오게
+# [점수]
+# 숫자만 나오게
 
-[등급]
-S / A / B / C 중 하나
+# [등급]
+# S / A / B / C 중 하나
 
-[잘된 점]
-- ...
+# [잘된 점]
+# - ...
 
-[부족한 점]
-- ...
+# [부족한 점]
+# - ...
 
-[개선 방향]
-- ...
+# [개선 방향]
+# - ...
 
-규칙:
-- 점수는 100점 기준
-- 공공기관 기준
-- 신뢰성 최우선
-- 불필요한 설명 금지
+# 규칙:
+# - 점수는 100점 기준
+# - 공공기관 기준
+# - 신뢰성 최우선
+# - 불필요한 설명 금지
 
-{task_evidence_rules}
+# {task_evidence_rules}
 
-{style_instruction}
-"""
+# {style_instruction}
+# """
 
-    user_input = f"""
-다음 프롬프트를 평가하라:
+#     user_input = f"""
+# 다음 프롬프트를 평가하라:
 
-{prompt}
-"""
+# {prompt}
+# """
 
-    return request_chat(system_prompt, user_input, max_tokens=max_tokens)
+#     return request_chat(system_prompt, user_input, max_tokens=max_tokens)
 
 def detect_hallucination(prompt_text, max_tokens=300):
     ensure_client()
